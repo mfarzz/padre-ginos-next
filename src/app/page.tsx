@@ -1,16 +1,25 @@
+import { Suspense } from "react";
 import MenuExplorer from "@/components/MenuExplorer";
-import { getFavoriteIds, getPizzas } from "@/lib/data";
+import { getPizzas } from "@/lib/data";
+
+function MenuFallback() {
+  return (
+    <div className="py-16 text-center">
+      Memuat favorit...
+    </div>
+  );
+}
 
 export default async function MenuPage() {
-  // Same for every visitor: cached, so it becomes part of the static shell
   const pizzas = await getPizzas();
-  // Changes all the time: not awaited, the promise streams to the browser
-  const favoriteIdsPromise = getFavoriteIds();
 
   return (
     <section>
       <h1 className="mb-6 text-3xl font-black">Menu</h1>
-      <MenuExplorer pizzas={pizzas} favoriteIdsPromise={favoriteIdsPromise} />
+
+      <Suspense fallback={<MenuFallback />}>
+        <MenuExplorer pizzas={pizzas} />
+      </Suspense>
     </section>
   );
 }
